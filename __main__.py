@@ -9,5 +9,13 @@ run = PVWatts_API.PVWatts_Run(area=1000, module_type=0,
                                     array_type="0", tilt="34",
                                     azimuth="180", timeframe="hourly")
 
-print(process_output.populate_df(run.output,
-        template=datetime_reference).head(24))
+hourly_data = process_output.populate_df(run.output,
+                    template=datetime_reference)
+
+daily_data = process_output.kW_per_day(hourly_data)
+
+summary_days = process_output.peak_days(daily_data)
+
+for case in summary_days:
+    print(case, summary_days[case], sep='\n')
+    print('\n')

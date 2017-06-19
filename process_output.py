@@ -18,12 +18,12 @@ def kW_per_day(df):
     only call after populate_df is called!'''
     summed_by_day = []
     for month in range(1,13):
-        profile = my_output.loc[my_output['Month'] == month, :]
+        profile = df.loc[df['Month'] == month, :]
         for day in range(1,32):
             power = profile.loc[profile['Day'] == day, :]
             generation = power['AC (kW)'].sum()
             if generation:
-                results.append([month, day, generation])
+                summed_by_day.append([month, day, generation])
     return(pd.DataFrame(summed_by_day, columns=['Month', 'Day', 'AC (kW)']))
 
 def peak_days(df):
