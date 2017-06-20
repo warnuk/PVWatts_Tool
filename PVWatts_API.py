@@ -45,7 +45,7 @@ class PVWatts_Run(object):
         self.annual_ratio = self.output['ac_annual']/self.area
 
     def describe(self):
-        print("Peak Day (max) Ratio: {id.max_ratio}".format(id=self),
-                "Low Day (min) Ratio: {id.min_ratio}".format(id=self),
-                "Avg. Day (median) Ratio: {id.median_ratio}".format(id=self),
-                "Annual Ratio: {id.annual_ratio}".format(id=self), sep="\n")
+        return(f"Peak Day (max) Ratio: {self.max_ratio}"
+        f"\nLow Day (min) Ratio: {self.min_ratio}"
+        f"\nAvg. Day (median) Ratio: {self.median_ratio}"
+        f"\n\nAnnual Ratio: {self.annual_ratio}")
