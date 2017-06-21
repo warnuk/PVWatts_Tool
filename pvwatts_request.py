@@ -1,6 +1,5 @@
 import requests
-import pandas as pd
-import numpy as np
+
 
 def get_output(area, module_type, **kwargs):
     """ pvwatts_output uses the PVWatts API to retrieve output from PVWatts API

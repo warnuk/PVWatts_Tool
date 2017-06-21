@@ -1,7 +1,8 @@
 from PVWatts_Tool import pvwatts_request
 from PVWatts_Tool import process_output
 
-datetime_reference = "resources/datetime_defaults.csv"
+
+datetime_reference = "datetime_defaults.csv"
 
 class PVWatts_Run(object):
     def __init__(self, area, module_type, lat, lon, losses,
@@ -30,8 +31,7 @@ class PVWatts_Run(object):
 
         self.ac_annual = self.output['ac_annual']
 
-        self.hourly_data = process_output.populate_df(self.output,
-                            template=datetime_reference)
+        self.hourly_data = process_output.populate_df(self.output)
 
         self.daily_data = process_output.kW_per_day(self.hourly_data)
 

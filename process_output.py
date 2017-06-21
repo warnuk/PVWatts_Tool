@@ -1,12 +1,9 @@
 import pandas as pd
-import numpy as np
+from PVWatts_Tool import dataframe_template
 
 def populate_df(data, template=None):
     '''put data into pandas DataFrame using template if provided'''
-    if template:
-        df = pd.read_csv(template, header=0)
-    else:
-        df = pd.DataFrame()
+    df = dataframe_template.template
     ac_kw = []
     for value in data['ac']:
         ac_kw.append(value/1000)
