@@ -1,5 +1,5 @@
-import pvwatts_request
-import process_output
+from PVWatts_Tool import pvwatts_request
+from PVWatts_Tool import process_output
 
 datetime_reference = "resources/datetime_defaults.csv"
 
@@ -28,6 +28,8 @@ class PVWatts_Run(object):
                                                 azimuth = self.azimuth,
                                                 timeframe = self.timeframe)
 
+        self.ac_annual = self.output['ac_annual']
+
         self.hourly_data = process_output.populate_df(self.output,
                             template=datetime_reference)
 
@@ -45,7 +47,8 @@ class PVWatts_Run(object):
         self.annual_ratio = self.output['ac_annual']/self.area
 
     def describe(self):
-        print("Peak Day (max) Ratio: {id.max_ratio}".format(id=self),
-                "Low Day (min) Ratio: {id.min_ratio}".format(id=self),
-                "Avg. Day (median) Ratio: {id.median_ratio}".format(id=self),
-                "Annual Ratio: {id.annual_ratio}".format(id=self), sep="\n")
+        return(f"Peak Day (max) Ratio: {self.max_ratio} (kWh/m^2/day)"
+        f"\nLow Day (min) Ratio: {self.min_ratio} (kWh/m^2/day)"
+        f"\nAvg. Day (median) Ratio: {self.median_ratio} (kWh/m^2/day)"
+        f"\nAnnual Ratio: {self.annual_ratio} (kWh/m^2/yr)"
+        f"\n\nAnnual AC Solar Potential: {self.ac_annual} (kWh)")
