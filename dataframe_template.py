@@ -44,5 +44,3 @@ template = pd.DataFrame({"Month": Month,
                          "Day": Day,
                          "Hour": Hour})
 
-# Reorder template DataFrame to display Month, then Day, then Hour...
-template = template['Month', 'Day', 'Hour']
