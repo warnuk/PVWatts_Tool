@@ -20,7 +20,15 @@ class PVWatts_Run(object):
         self.timeframe = timeframe
         self.ratetype = ratetype
 
-        self.pvwatts_output = nrel_requests.pvwatts_output(area = self.area,
+        # Use proper efficiency rating for module_type.
+        if self.module_type == 0:
+            self.system_capacity = round(0.15 * self.area, 1)
+        elif self.module_type == 1:
+            self.system_capacity = round(0.19 * self.area, 1)
+        elif self.module_type == 2:
+            self.system_capacity = round(0.1 * self.area, 1)
+
+        self.pvwatts_output = nrel_requests.pvwatts_output(system_capacity = self.system_capacity,
                                                 module_type = self.module_type,
                                                 lat = self.lat,
                                                 lon = self.lon,
@@ -55,7 +63,8 @@ class PVWatts_Run(object):
         self.annual_ratio = self.pvwatts_output['ac_annual']/self.area
 
     def describe(self):
-        return(f"Peak Day (max) Ratio: {self.max_ratio} (kWh/m^2/day)"
+        return(f"System Capacity: {self.system_capacity} (kWdc)"
+        f"\n\nPeak Day (max) Ratio: {self.max_ratio} (kWh/m^2/day)"
         f"\nLow Day (min) Ratio: {self.min_ratio} (kWh/m^2/day)"
         f"\nAvg. Day (median) Ratio: {self.median_ratio} (kWh/m^2/day)"
         f"\nAnnual Ratio: {self.annual_ratio} (kWh/m^2/yr)"

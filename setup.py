@@ -5,7 +5,7 @@ setup(
     name='PVWatts_Tool',
     version='0.2.dev',
     url='https://github.com/warnuk/PVWatts_Tool',
-    packages=find_packages('~/PVWatts_Tool'),
+    packages=['PVWatts_Tool'],
     license='MIT',
     author='warnuk',
     author_email='warnuk@umich.edu',

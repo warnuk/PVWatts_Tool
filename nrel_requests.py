@@ -1,17 +1,7 @@
 import requests
 
-def pvwatts_output(area, module_type, **kwargs):
+def pvwatts_output(system_capacity, module_type, **kwargs):
     """ Uses the PVWatts API to retrieve output from PVWatts API for given inputs."""
-    # Use proper efficiency rating for module_type.
-    if module_type == 0:
-        efficiency = .15
-    elif module_type == 1:
-        efficiency = .19
-    elif module_type == 2:
-        efficiency = .1
-
-    # Calculate system_capacity.
-    system_capacity = area * efficiency
 
     # Define url and individual params seperately.
     url = "https://developer.nrel.gov/api/pvwatts/v5.json?"
