@@ -1,4 +1,4 @@
-from PVWatts_Tool import pvwatts_request
+from PVWatts_Tool import nrel_requests
 from PVWatts_Tool import process_output
 
 
@@ -6,9 +6,9 @@ datetime_reference = "datetime_defaults.csv"
 
 class PVWatts_Run(object):
     def __init__(self, area, module_type, lat, lon, losses,
-                array_type, tilt, azimuth, timeframe):
-        '''PVWatts_Run object takes location/system attributes to
-        call PVWatts API and assign output to its output attribute'''
+                array_type, tilt, azimuth, timeframe, ratetype):
+        """PVWatts_Run object takes location/system attributes to
+        call PVWatts API and assign output to its output attribute"""
         self.area = area
         self.module_type = module_type
         self.lat = lat
@@ -18,8 +18,9 @@ class PVWatts_Run(object):
         self.tilt = tilt
         self.azimuth = azimuth
         self.timeframe = timeframe
+        self.ratetype = ratetype
 
-        self.output = pvwatts_request.get_output(area = self.area,
+        self.pvwatts_output = nrel_requests.pvwatts_output(area = self.area,
                                                 module_type = self.module_type,
                                                 lat = self.lat,
                                                 lon = self.lon,
@@ -29,9 +30,16 @@ class PVWatts_Run(object):
                                                 azimuth = self.azimuth,
                                                 timeframe = self.timeframe)
 
-        self.ac_annual = self.output['ac_annual']
+        self.utility_output = nrel_requests.utility_output(self.lat, self.lon)
 
-        self.hourly_data = process_output.populate_df(self.output)
+        self.util_name = self.utility_output['utility_name']
+        self.rate = self.utility_output[self.ratetype]
+
+        self.ac_annual = self.pvwatts_output['ac_annual']
+
+        self.energy_value = round(self.ac_annual * self.rate, 2)
+
+        self.hourly_data = process_output.populate_df(self.pvwatts_output)
 
         self.daily_data = process_output.kW_per_day(self.hourly_data)
 
@@ -44,11 +52,14 @@ class PVWatts_Run(object):
         self.median = process_output.peak_days(self.daily_data)['median']
         self.median_ratio = self.median.iloc[0,2]/self.area
 
-        self.annual_ratio = self.output['ac_annual']/self.area
+        self.annual_ratio = self.pvwatts_output['ac_annual']/self.area
 
     def describe(self):
         return(f"Peak Day (max) Ratio: {self.max_ratio} (kWh/m^2/day)"
         f"\nLow Day (min) Ratio: {self.min_ratio} (kWh/m^2/day)"
         f"\nAvg. Day (median) Ratio: {self.median_ratio} (kWh/m^2/day)"
         f"\nAnnual Ratio: {self.annual_ratio} (kWh/m^2/yr)"
-        f"\n\nAnnual AC Solar Potential: {self.ac_annual} (kWh)")
+        f"\n\nAnnual AC Solar Potential: {self.ac_annual} (kWh)"
+        f"\nUtility: {self.util_name}"
+        f"\nRate: ${self.rate}/kWh"
+        f"\nEnergy Value: ${self.energy_value}")
