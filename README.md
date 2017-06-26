@@ -1,9 +1,9 @@
-# PVWatts_tool
-# Author: Will Arnuk
-# Version: 0.1dev
-# Credits: NREL
-# Date: 6-26-17
-# Requirements: pandas, requests, PyQt5
+# PVWatts Tool
+### Author: Will Arnuk
+#### Date: 6-26-17
+###### Version: 0.1.dev
+###### Credits: NREL
+###### Requirements: pandas, requests, PyQt5
 
 PVWatts_Tool is based off of NREL APIs, including the PVWatts (v5) API and the Energy Utilities API.
 
@@ -17,4 +17,3 @@ The GUI tool can be run from the python interpreter using the following commands
     PVWatts_Tool.run()
 
 This launches the GUI, built using PyQt5. Input parameters are entered in the left pane, output is printed to the right.
-
