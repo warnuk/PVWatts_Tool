@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: PVWatts-Tool
+Version: 1.0.3
+Summary: A tool that calls on NREL APIs to generate useful information for solar PV resource planning.
+Home-page: https://github.com/warnuk/PVWatts_Tool
+Author: warnuk
+Author-email: warnuk@umich.edu
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3

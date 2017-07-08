@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name='PVWatts_Tool',
-    version='0.2.dev',
+    version='1.0.3',
     url='https://github.com/warnuk/PVWatts_Tool',
     packages=['PVWatts_Tool'],
     license='MIT',
