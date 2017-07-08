@@ -1,11 +1,20 @@
 #! /usr/bin/env python
 import sys
+import os
+import pandas
 from PyQt5 import QtWidgets
 
 from PVWatts_Tool import PVWatts_API
 
-class Window(QtWidgets.QWidget):
+__author__ = "warnuk"
+__credits__ = ["warnuk", "NREL", "PVWatts"]
+__license__ = "MIT"
+__version__ = "1.0.1"
+__maintainer__ = "warnuk"
+__email__ = "warnuk@umich.edu"
+__status__ = "Development"
 
+class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.init_ui()
@@ -22,11 +31,13 @@ class Window(QtWidgets.QWidget):
         container = QtWidgets.QHBoxLayout()
 
         left_pane = QtWidgets.QVBoxLayout()
+        right_pane = QtWidgets.QVBoxLayout()
 
         parameters = QtWidgets.QHBoxLayout()
         param_labels = QtWidgets.QVBoxLayout()
         param_fields = QtWidgets.QVBoxLayout()
 
+        self.api_l = QtWidgets.QLabel("API Key: ")
         self.area_l = QtWidgets.QLabel("Area (m^2): ")
         self.module_l = QtWidgets.QLabel("Module Type: ")
         self.lat_l = QtWidgets.QLabel("Lat (+/- °): ")
@@ -37,6 +48,7 @@ class Window(QtWidgets.QWidget):
         self.azimuth_l = QtWidgets.QLabel("Azimuth (°): ")
         self.rate_l = QtWidgets.QLabel("Rate Type: ")
 
+        param_labels.addWidget(self.api_l)
         param_labels.addWidget(self.area_l)
         param_labels.addWidget(self.module_l)
         param_labels.addWidget(self.lat_l)
@@ -47,9 +59,10 @@ class Window(QtWidgets.QWidget):
         param_labels.addWidget(self.azimuth_l)
         param_labels.addWidget(self.rate_l)
 
+        self.api_le = QtWidgets.QLineEdit()
         self.area_le = QtWidgets.QLineEdit("1000")
         self.module_le = QtWidgets.QComboBox()
-        self.module_le.insertItems(0,["Standard","Premium","Thin Film"])
+        self.module_le.insertItems(0, ["Standard", "Premium", "Thin Film"])
         self.lat_le = QtWidgets.QLineEdit("42.3")
         self.lon_le = QtWidgets.QLineEdit("-83.7")
         self.losses_le = QtWidgets.QLineEdit("14")
@@ -61,6 +74,7 @@ class Window(QtWidgets.QWidget):
         self.rate_le = QtWidgets.QComboBox()
         self.rate_le.insertItems(0, ["Residential", "Commercial", "Industrial"])
 
+        param_fields.addWidget(self.api_le)
         param_fields.addWidget(self.area_le)
         param_fields.addWidget(self.module_le)
         param_fields.addWidget(self.lat_le)
@@ -70,6 +84,18 @@ class Window(QtWidgets.QWidget):
         param_fields.addWidget(self.tilt_le)
         param_fields.addWidget(self.azimuth_le)
         param_fields.addWidget(self.rate_le)
+
+        output_layout = QtWidgets.QHBoxLayout()
+        self.output_l = QtWidgets.QLabel("Save hourly data to file: ")
+        self.output_check = QtWidgets.QCheckBox()
+        self.savefilepath = QtWidgets.QLineEdit()
+        self.fileselect = QtWidgets.QPushButton("Save as...")
+
+        output_layout.addWidget(self.output_check)
+        output_layout.addWidget(self.output_l)
+
+        output_layout.addWidget(self.savefilepath)
+        output_layout.addWidget(self.fileselect)
 
         self.submit = QtWidgets.QPushButton("Submit")
 
@@ -82,15 +108,21 @@ class Window(QtWidgets.QWidget):
         self.output_box = QtWidgets.QPlainTextEdit()
         self.output_box.setFixedWidth(500)
 
+        right_pane.addWidget(self.output_box)
+        right_pane.addLayout(output_layout)
+
         container.addLayout(left_pane)
-        container.addWidget(self.output_box)
+        container.addLayout(right_pane)
 
-
-
+        self.fileselect.clicked.connect(self.set_output_file)
         self.submit.clicked.connect(self.generate_output)
         self.setLayout(container)
-        self.setWindowTitle("PV Watts Tool")
+        self.setWindowTitle("PVWatts Tool")
         self.show()
+
+    def set_output_file(self):
+        destination = str(QtWidgets.QFileDialog.getSaveFileName(self, 'Save CSV', os.getenv('HOME'), 'CSV(*.csv)')[0])
+        self.savefilepath.setText(destination)
 
     def module_type(self):
         """Convert descriptive user-input into PVWatts API input parameters.
@@ -104,7 +136,7 @@ class Window(QtWidgets.QWidget):
             moduletype_id = "1"
         elif self.module_le.currentText() == "Thin Film":
             moduletype_id = "2"
-        return(moduletype_id)
+        return (moduletype_id)
 
     def array_type(self):
         """Convert descriptive user-input into PVWatts API input parameters.
@@ -122,27 +154,32 @@ class Window(QtWidgets.QWidget):
             arraytype_id = "3"
         elif self.array_le.currentText() == "2-Axis":
             arraytype_id = "4"
-        return(arraytype_id)
+        return (arraytype_id)
 
     def generate_output(self):
         """Creates a global scenario object and prints descriptive information to the output box."""
 
         global scenario
-        scenario = PVWatts_API.PVWatts_Run(area=int(self.area_le.text()),
-                                      module_type=int(self.module_type()),
-                                      lat=self.lat_le.text(),
-                                      lon=self.lon_le.text(),
-                                      losses=self.losses_le.text(),
-                                      array_type=self.array_type(),
-                                      tilt=self.tilt_le.text(),
-                                      azimuth=self.azimuth_le.text(),
-                                      timeframe='hourly',
-                                      ratetype=self.rate_le.currentText().lower())
+        scenario = PVWatts_API.PVWatts_Run(api_key=self.api_le.text(),
+                                           area=float(self.area_le.text()),
+                                           module_type=int(self.module_type()),
+                                           lat=self.lat_le.text(),
+                                           lon=self.lon_le.text(),
+                                           losses=self.losses_le.text(),
+                                           array_type=self.array_type(),
+                                           tilt=self.tilt_le.text(),
+                                           azimuth=self.azimuth_le.text(),
+                                           timeframe='hourly',
+                                           ratetype=self.rate_le.currentText().lower())
         if self.first_run:
             self.output_box.appendPlainText(scenario.describe())
             self.first_run = False
         else:
             self.output_box.appendPlainText('--------------------' + '\n' + scenario.describe())
+
+        if self.output_check.isChecked():
+            scenario.hourly_data.to_csv(self.savefilepath.text())
+
 
 def run():
     """Make GUI call-able from python interpreter.

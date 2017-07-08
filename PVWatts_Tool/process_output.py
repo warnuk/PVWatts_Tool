@@ -1,6 +1,19 @@
+"""process_output.py
+by warnuk
+
+This module forms a pandas dataframe using the hourly data from PVWatts. It calculates daily summaries and max/min/med
+days from the daily data."""
+
 import pandas as pd
 from PVWatts_Tool import dataframe_template
 
+__author__ = "warnuk"
+__credits__ = ["warnuk", "NREL", "PVWatts"]
+__license__ = "MIT"
+__version__ = "1.0.1"
+__maintainer__ = "warnuk"
+__email__ = "warnuk@umich.edu"
+__status__ = "Development"
 
 def populate_df(data):
     """put data into pandas DataFrame using template from dataframe_template module"""

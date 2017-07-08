@@ -1,4 +1,17 @@
+"""dataframe_template.py
+by warnuk
+
+This module sets up a template pandas DataFrame that will be used to sort hourly data from PVWatts into daily data."""
+
 import pandas as pd
+
+__author__ = "warnuk"
+__credits__ = ["warnuk", "NREL", "PVWatts"]
+__license__ = "MIT"
+__version__ = "1.0.1"
+__maintainer__ = "warnuk"
+__email__ = "warnuk@umich.edu"
+__status__ = "Development"
 
 # Create a dictionary representing the typical number of days in a month.
 days = {1: 31,
@@ -40,7 +53,9 @@ for i in range(0, 365):
         Hour.append(x)
 
 # Create the final DataFrame to be used as a template by the process_output module.
+cols = ["Month", "Day", "Hour"]
 template = pd.DataFrame({"Month": Month,
                          "Day": Day,
-                         "Hour": Hour})
+                         "Hour": Hour})[cols]
+
 
