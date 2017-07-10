@@ -1,9 +1,8 @@
 from distutils.core import setup
-from setuptools import find_packages
 
 setup(
     name='PVWatts_Tool',
-    version='1.0.5',
+    version='1.1.0',
     url='https://github.com/warnuk/PVWatts_Tool',
     packages=['PVWatts_Tool'],
     license='MIT',

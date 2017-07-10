@@ -9,7 +9,7 @@ from PVWatts_Tool import PVWatts_API
 __author__ = "warnuk"
 __credits__ = ["warnuk", "NREL", "PVWatts"]
 __license__ = "MIT"
-__version__ = "1.0.5"
+__version__ = "1.1.0"
 __maintainer__ = "warnuk"
 __email__ = "warnuk@umich.edu"
 __status__ = "Development"
@@ -26,9 +26,6 @@ class Window(QtWidgets.QWidget):
         The submit button creates a new instance of a pvwatts_run object. The pvwatts_run object calls NREL APIs using
         user-input to generate solar potential estimates and rate/utility information. This info is then output to the
         output box on the right side of the container."""
-
-        qtRectangle = self.frameGeometry()
-        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
 
         self.first_run = True
         container = QtWidgets.QVBoxLayout()
@@ -248,5 +245,3 @@ def run():
     app = QtWidgets.QApplication(sys.argv)
     current_run = Window()
     sys.exit(app.exec())
-
-run()

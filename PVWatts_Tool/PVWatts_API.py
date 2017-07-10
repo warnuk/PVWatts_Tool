@@ -13,7 +13,7 @@ from PVWatts_Tool import process_output
 __author__ = "warnuk"
 __credits__ = ["warnuk", "NREL", "PVWatts"]
 __license__ = "MIT"
-__version__ = "1.0.5"
+__version__ = "1.1.0"
 __maintainer__ = "warnuk"
 __email__ = "warnuk@umich.edu"
 __status__ = "Development"
