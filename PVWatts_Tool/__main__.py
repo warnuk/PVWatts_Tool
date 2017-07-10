@@ -9,7 +9,7 @@ from PVWatts_Tool import PVWatts_API
 __author__ = "warnuk"
 __credits__ = ["warnuk", "NREL", "PVWatts"]
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.5"
 __maintainer__ = "warnuk"
 __email__ = "warnuk@umich.edu"
 __status__ = "Development"
@@ -27,92 +27,144 @@ class Window(QtWidgets.QWidget):
         user-input to generate solar potential estimates and rate/utility information. This info is then output to the
         output box on the right side of the container."""
 
+        qtRectangle = self.frameGeometry()
+        centerPoint = QtWidgets.QDesktopWidget().availableGeometry().center()
+
         self.first_run = True
-        container = QtWidgets.QHBoxLayout()
+        container = QtWidgets.QVBoxLayout()
+        subcontainer = QtWidgets.QHBoxLayout()
 
         left_pane = QtWidgets.QVBoxLayout()
         right_pane = QtWidgets.QVBoxLayout()
 
-        parameters = QtWidgets.QHBoxLayout()
-        param_labels = QtWidgets.QVBoxLayout()
-        param_fields = QtWidgets.QVBoxLayout()
+        parameters = QtWidgets.QVBoxLayout()
 
+        api_row = QtWidgets.QHBoxLayout()
         self.api_l = QtWidgets.QLabel("API Key: ")
-        self.area_l = QtWidgets.QLabel("Area (m^2): ")
-        self.module_l = QtWidgets.QLabel("Module Type: ")
-        self.lat_l = QtWidgets.QLabel("Lat (+/- °): ")
-        self.lon_l = QtWidgets.QLabel("Lon (+/- °): ")
-        self.losses_l = QtWidgets.QLabel("Losses (%): ")
-        self.array_l = QtWidgets.QLabel("Array Type: ")
-        self.tilt_l = QtWidgets.QLabel("Tilt (°)")
-        self.azimuth_l = QtWidgets.QLabel("Azimuth (°): ")
-        self.rate_l = QtWidgets.QLabel("Rate Type: ")
-
-        param_labels.addWidget(self.api_l)
-        param_labels.addWidget(self.area_l)
-        param_labels.addWidget(self.module_l)
-        param_labels.addWidget(self.lat_l)
-        param_labels.addWidget(self.lon_l)
-        param_labels.addWidget(self.losses_l)
-        param_labels.addWidget(self.array_l)
-        param_labels.addWidget(self.tilt_l)
-        param_labels.addWidget(self.azimuth_l)
-        param_labels.addWidget(self.rate_l)
-
+        self.api_l.setFixedWidth(150)
         self.api_le = QtWidgets.QLineEdit()
+        api_row.addWidget(self.api_l)
+        api_row.addWidget(self.api_le)
+
+        area_row = QtWidgets.QHBoxLayout()
+        self.area_l = QtWidgets.QLabel("Area (m^2): ")
+        self.area_l.setFixedWidth(150)
         self.area_le = QtWidgets.QLineEdit("1000")
-        self.module_le = QtWidgets.QComboBox()
-        self.module_le.insertItems(0, ["Standard", "Premium", "Thin Film"])
+        area_row.addWidget(self.area_l)
+        area_row.addWidget(self.area_le)
+
+        module_row = QtWidgets.QHBoxLayout()
+        self.module_l = QtWidgets.QLabel("Module Type: ")
+        self.module_l.setFixedWidth(150)
+        self.module_cb = QtWidgets.QComboBox()
+        self.module_cb.insertItems(0, ["Standard", "Premium", "Thin Film"])
+        module_row.addWidget(self.module_l)
+        module_row.addWidget(self.module_cb)
+
+        lat_row = QtWidgets.QHBoxLayout()
+        self.lat_l = QtWidgets.QLabel("Lat (+/- °): ")
+        self.lat_l.setFixedWidth(150)
         self.lat_le = QtWidgets.QLineEdit("42.3")
+        lat_row.addWidget(self.lat_l)
+        lat_row.addWidget(self.lat_le)
+
+        lon_row = QtWidgets.QHBoxLayout()
+        self.lon_l = QtWidgets.QLabel("Lon (+/- °): ")
+        self.lon_l.setFixedWidth(150)
         self.lon_le = QtWidgets.QLineEdit("-83.7")
+        lon_row.addWidget(self.lon_l)
+        lon_row.addWidget(self.lon_le)
+
+        losses_row = QtWidgets.QHBoxLayout()
+        self.losses_l = QtWidgets.QLabel("Losses (%): ")
+        self.losses_l.setFixedWidth(150)
         self.losses_le = QtWidgets.QLineEdit("14")
-        self.array_le = QtWidgets.QComboBox()
-        self.array_le.insertItems(0, ["Fixed - Open Rack", "Fixed - Roof Mounted", "1-Axis",
+        losses_row.addWidget(self.losses_l)
+        losses_row.addWidget(self.losses_le)
+
+        array_row = QtWidgets.QHBoxLayout()
+        self.array_l = QtWidgets.QLabel("Array Type: ")
+        self.array_l.setFixedWidth(150)
+        self.array_cb = QtWidgets.QComboBox()
+        self.array_cb.insertItems(0, ["Fixed - Open Rack", "Fixed - Roof Mounted", "1-Axis",
                                       "1-Axis Backtracking", "2-Axis"])
+        array_row.addWidget(self.array_l)
+        array_row.addWidget(self.array_cb)
+
+        tilt_row = QtWidgets.QHBoxLayout()
+        self.tilt_l = QtWidgets.QLabel("Tilt (°)")
+        self.tilt_l.setFixedWidth(150)
         self.tilt_le = QtWidgets.QLineEdit("34")
+        tilt_row.addWidget(self.tilt_l)
+        tilt_row.addWidget(self.tilt_le)
+
+        azimuth_row = QtWidgets.QHBoxLayout()
+        self.azimuth_l = QtWidgets.QLabel("Azimuth (°): ")
+        self.azimuth_l.setFixedWidth(150)
         self.azimuth_le = QtWidgets.QLineEdit("180")
-        self.rate_le = QtWidgets.QComboBox()
-        self.rate_le.insertItems(0, ["Residential", "Commercial", "Industrial"])
+        azimuth_row.addWidget(self.azimuth_l)
+        azimuth_row.addWidget(self.azimuth_le)
 
-        param_fields.addWidget(self.api_le)
-        param_fields.addWidget(self.area_le)
-        param_fields.addWidget(self.module_le)
-        param_fields.addWidget(self.lat_le)
-        param_fields.addWidget(self.lon_le)
-        param_fields.addWidget(self.losses_le)
-        param_fields.addWidget(self.array_le)
-        param_fields.addWidget(self.tilt_le)
-        param_fields.addWidget(self.azimuth_le)
-        param_fields.addWidget(self.rate_le)
+        rate_row = QtWidgets.QHBoxLayout()
+        self.rate_l = QtWidgets.QLabel("Rate Type: ")
+        self.rate_l.setFixedWidth(150)
+        self.rate_cb = QtWidgets.QComboBox()
+        self.rate_cb.insertItems(0, ["Residential", "Commercial", "Industrial"])
+        rate_row.addWidget(self.rate_l)
+        rate_row.addWidget(self.rate_cb)
 
-        output_layout = QtWidgets.QHBoxLayout()
-        self.output_l = QtWidgets.QLabel("Save hourly data to file: ")
-        self.output_check = QtWidgets.QCheckBox()
-        self.savefilepath = QtWidgets.QLineEdit()
-        self.fileselect = QtWidgets.QPushButton("Save as...")
+        incentivized_row = QtWidgets.QHBoxLayout()
+        self.incentivized_l = QtWidgets.QLabel("LCOE with Tax Credits: ")
+        self.incentivized_l.setFixedWidth(150)
+        self.incentivized_cb = QtWidgets.QComboBox()
+        self.incentivized_cb.insertItems(0, ["Yes", "No"])
+        incentivized_row.addWidget(self.incentivized_l)
+        incentivized_row.addWidget(self.incentivized_cb)
 
-        output_layout.addWidget(self.output_check)
-        output_layout.addWidget(self.output_l)
+        intro_text = "The PVWatts Tool for Python makes calls to the PVWatts v5 API from NREL to retrieve useful " \
+                     "information about the solar potential for a given area." \
+                     "\nParameters can be set in the left pane; output is displayed on the right." \
+                     "\n\nIn order to use the tool, you must obtain a developer key from NREL " \
+                     "(https://developer.nrel.gov/signup/)" \
+                     "\n\nPlease enter your key below before clicking 'submit'.\n"
+        self.intro = QtWidgets.QLabel(intro_text)
+        container.addWidget(self.intro)
+        container.addLayout(api_row)
 
-        output_layout.addWidget(self.savefilepath)
-        output_layout.addWidget(self.fileselect)
-
-        self.submit = QtWidgets.QPushButton("Submit")
-
-        parameters.addLayout(param_labels)
-        parameters.addLayout(param_fields)
+        parameters.addLayout(area_row)
+        parameters.addLayout(module_row)
+        parameters.addLayout(lat_row)
+        parameters.addLayout(lon_row)
+        parameters.addLayout(losses_row)
+        parameters.addLayout(array_row)
+        parameters.addLayout(tilt_row)
+        parameters.addLayout(azimuth_row)
+        parameters.addLayout(rate_row)
+        parameters.addLayout(incentivized_row)
 
         left_pane.addLayout(parameters)
-        left_pane.addWidget(self.submit)
 
         self.output_box = QtWidgets.QPlainTextEdit()
         self.output_box.setFixedWidth(500)
 
         right_pane.addWidget(self.output_box)
-        right_pane.addLayout(output_layout)
 
-        container.addLayout(left_pane)
-        container.addLayout(right_pane)
+        subcontainer.addLayout(left_pane)
+        subcontainer.addLayout(right_pane)
+
+        output_layout = QtWidgets.QHBoxLayout()
+        self.output_l = QtWidgets.QLabel("Save hourly data to file: ")
+        self.savefilepath = QtWidgets.QLineEdit()
+        self.fileselect = QtWidgets.QPushButton("Save as...")
+        output_layout.addWidget(self.output_l)
+        output_layout.addWidget(self.savefilepath)
+        output_layout.addWidget(self.fileselect)
+
+        self.submit = QtWidgets.QPushButton("Submit")
+
+        container.addLayout(subcontainer)
+        container.addLayout(output_layout)
+        container.addWidget(self.submit)
 
         self.fileselect.clicked.connect(self.set_output_file)
         self.submit.clicked.connect(self.generate_output)
@@ -130,11 +182,11 @@ class Window(QtWidgets.QWidget):
         PVWatts requires numeric input for the module type parameter; this method allows the user to select from
         more descriptive options and generate the required input parameter."""
 
-        if self.module_le.currentText() == "Standard":
+        if self.module_cb.currentText() == "Standard":
             moduletype_id = "0"
-        elif self.module_le.currentText() == "Premium":
+        elif self.module_cb.currentText() == "Premium":
             moduletype_id = "1"
-        elif self.module_le.currentText() == "Thin Film":
+        elif self.module_cb.currentText() == "Thin Film":
             moduletype_id = "2"
         return (moduletype_id)
 
@@ -144,17 +196,23 @@ class Window(QtWidgets.QWidget):
         PVWatts requires numeric input for the array type parameter; this method allows the user to select from
         more descriptive options and generate the required input parameter."""
 
-        if self.array_le.currentText() == "Fixed - Open Rack":
+        if self.array_cb.currentText() == "Fixed - Open Rack":
             arraytype_id = "0"
-        elif self.array_le.currentText() == "Fixed - Roof Mounted":
+        elif self.array_cb.currentText() == "Fixed - Roof Mounted":
             arraytype_id = "1"
-        elif self.array_le.currentText() == "1-Axis":
+        elif self.array_cb.currentText() == "1-Axis":
             arraytype_id = "2"
-        elif self.array_le.currentText() == "1-Axis Backtracking":
+        elif self.array_cb.currentText() == "1-Axis Backtracking":
             arraytype_id = "3"
-        elif self.array_le.currentText() == "2-Axis":
+        elif self.array_cb.currentText() == "2-Axis":
             arraytype_id = "4"
         return (arraytype_id)
+
+    def incentivized(self):
+        if self.incentivized_cb.currentText() == "Yes":
+            return(True)
+        else:
+            return (False)
 
     def generate_output(self):
         """Creates a global scenario object and prints descriptive information to the output box."""
@@ -170,16 +228,17 @@ class Window(QtWidgets.QWidget):
                                            tilt=self.tilt_le.text(),
                                            azimuth=self.azimuth_le.text(),
                                            timeframe='hourly',
-                                           ratetype=self.rate_le.currentText().lower())
+                                           ratetype=self.rate_cb.currentText().lower(),
+                                           incentivized=self.incentivized())
+
         if self.first_run:
             self.output_box.appendPlainText(scenario.describe())
             self.first_run = False
         else:
             self.output_box.appendPlainText('--------------------' + '\n' + scenario.describe())
 
-        if self.output_check.isChecked():
+        if self.savefilepath.text():
             scenario.hourly_data.to_csv(self.savefilepath.text())
-
 
 def run():
     """Make GUI call-able from python interpreter.
@@ -189,3 +248,5 @@ def run():
     app = QtWidgets.QApplication(sys.argv)
     current_run = Window()
     sys.exit(app.exec())
+
+run()

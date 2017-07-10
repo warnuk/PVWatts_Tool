@@ -13,7 +13,7 @@ from PVWatts_Tool import process_output
 __author__ = "warnuk"
 __credits__ = ["warnuk", "NREL", "PVWatts"]
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.5"
 __maintainer__ = "warnuk"
 __email__ = "warnuk@umich.edu"
 __status__ = "Development"
@@ -21,7 +21,7 @@ datetime_reference = "datetime_defaults.csv"
 
 class PVWatts_Run(object):
     def __init__(self, api_key, area, module_type, lat, lon, losses,
-                 array_type, tilt, azimuth, timeframe, ratetype):
+                 array_type, tilt, azimuth, timeframe, ratetype, incentivized):
         """PVWatts_Run object takes location/system attributes to
         call PVWatts API and assign output to its output attribute"""
         self.api_key = api_key
@@ -35,6 +35,7 @@ class PVWatts_Run(object):
         self.azimuth = azimuth
         self.timeframe = timeframe
         self.ratetype = ratetype
+        self.incentivized = incentivized
 
         # Use proper efficiency rating for module_type.
         if self.module_type == 0:
@@ -64,6 +65,14 @@ class PVWatts_Run(object):
 
         self.energy_value = round(self.ac_annual * self.rate, 2)
 
+        # EIA AEO 2017 estimates LCOE of solar pv to be $77.7 / MWh, or $58.8 / MWh with tax credits
+        if self.incentivized:
+            self.cost = round(self.ac_annual * (58.8 / 1000), 2)
+        else:
+            self.cost = round(self.ac_annual * (77.7 / 1000), 2)
+
+        self.savings = round(self.energy_value - self.cost, 2)
+
         self.hourly_data = process_output.populate_df(self.pvwatts_output)
 
         self.daily_data = process_output.kW_per_day(self.hourly_data)
@@ -88,4 +97,6 @@ class PVWatts_Run(object):
                 f"\n\nAnnual AC Solar Potential: {self.ac_annual} (kWh)"
                 f"\nUtility: {self.util_name}"
                 f"\nRate: ${self.rate}/kWh"
-                f"\nEnergy Value: ${self.energy_value}")
+                f"\nEnergy Value: ${self.energy_value}"
+                f"\nEstimated Cost: ${self.cost}"
+                f"\nEstimated Savings: ${self.savings}")
