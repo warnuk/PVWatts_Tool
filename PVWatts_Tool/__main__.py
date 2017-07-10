@@ -9,7 +9,7 @@ from PVWatts_Tool import PVWatts_API
 __author__ = "warnuk"
 __credits__ = ["warnuk", "NREL", "PVWatts"]
 __license__ = "MIT"
-__version__ = "1.0.1"
+__version__ = "1.0.5"
 __maintainer__ = "warnuk"
 __email__ = "warnuk@umich.edu"
 __status__ = "Development"
@@ -28,7 +28,8 @@ class Window(QtWidgets.QWidget):
         output box on the right side of the container."""
 
         self.first_run = True
-        container = QtWidgets.QHBoxLayout()
+        container = QtWidgets.QVBoxLayout()
+        subcontainer = QtWidgets.QHBoxLayout()
 
         left_pane = QtWidgets.QVBoxLayout()
         right_pane = QtWidgets.QVBoxLayout()
@@ -47,6 +48,7 @@ class Window(QtWidgets.QWidget):
         self.tilt_l = QtWidgets.QLabel("Tilt (°)")
         self.azimuth_l = QtWidgets.QLabel("Azimuth (°): ")
         self.rate_l = QtWidgets.QLabel("Rate Type: ")
+        self.incentivized_l = QtWidgets.QLabel("LCOE with Tax Credits: ")
 
         param_labels.addWidget(self.api_l)
         param_labels.addWidget(self.area_l)
@@ -58,6 +60,7 @@ class Window(QtWidgets.QWidget):
         param_labels.addWidget(self.tilt_l)
         param_labels.addWidget(self.azimuth_l)
         param_labels.addWidget(self.rate_l)
+        param_labels.addWidget(self.incentivized_l)
 
         self.api_le = QtWidgets.QLineEdit()
         self.area_le = QtWidgets.QLineEdit("1000")
@@ -73,6 +76,8 @@ class Window(QtWidgets.QWidget):
         self.azimuth_le = QtWidgets.QLineEdit("180")
         self.rate_le = QtWidgets.QComboBox()
         self.rate_le.insertItems(0, ["Residential", "Commercial", "Industrial"])
+        self.incentivized_cb = QtWidgets.QComboBox()
+        self.incentivized_cb.insertItems(0, ["Yes", "No"])
 
         param_fields.addWidget(self.api_le)
         param_fields.addWidget(self.area_le)
@@ -84,35 +89,34 @@ class Window(QtWidgets.QWidget):
         param_fields.addWidget(self.tilt_le)
         param_fields.addWidget(self.azimuth_le)
         param_fields.addWidget(self.rate_le)
-
-        output_layout = QtWidgets.QHBoxLayout()
-        self.output_l = QtWidgets.QLabel("Save hourly data to file: ")
-        self.output_check = QtWidgets.QCheckBox()
-        self.savefilepath = QtWidgets.QLineEdit()
-        self.fileselect = QtWidgets.QPushButton("Save as...")
-
-        output_layout.addWidget(self.output_check)
-        output_layout.addWidget(self.output_l)
-
-        output_layout.addWidget(self.savefilepath)
-        output_layout.addWidget(self.fileselect)
-
-        self.submit = QtWidgets.QPushButton("Submit")
+        param_fields.addWidget(self.incentivized_cb)
 
         parameters.addLayout(param_labels)
         parameters.addLayout(param_fields)
 
         left_pane.addLayout(parameters)
-        left_pane.addWidget(self.submit)
 
         self.output_box = QtWidgets.QPlainTextEdit()
         self.output_box.setFixedWidth(500)
 
         right_pane.addWidget(self.output_box)
-        right_pane.addLayout(output_layout)
 
-        container.addLayout(left_pane)
-        container.addLayout(right_pane)
+        subcontainer.addLayout(left_pane)
+        subcontainer.addLayout(right_pane)
+
+        output_layout = QtWidgets.QHBoxLayout()
+        self.output_l = QtWidgets.QLabel("Save hourly data to file: ")
+        self.savefilepath = QtWidgets.QLineEdit()
+        self.fileselect = QtWidgets.QPushButton("Save as...")
+        output_layout.addWidget(self.output_l)
+        output_layout.addWidget(self.savefilepath)
+        output_layout.addWidget(self.fileselect)
+
+        self.submit = QtWidgets.QPushButton("Submit")
+
+        container.addLayout(subcontainer)
+        container.addLayout(output_layout)
+        container.addWidget(self.submit)
 
         self.fileselect.clicked.connect(self.set_output_file)
         self.submit.clicked.connect(self.generate_output)
@@ -156,6 +160,12 @@ class Window(QtWidgets.QWidget):
             arraytype_id = "4"
         return (arraytype_id)
 
+    def incentivized(self):
+        if self.incentivized_cb.currentText() == "Yes":
+            return(True)
+        else:
+            return (False)
+
     def generate_output(self):
         """Creates a global scenario object and prints descriptive information to the output box."""
 
@@ -170,16 +180,17 @@ class Window(QtWidgets.QWidget):
                                            tilt=self.tilt_le.text(),
                                            azimuth=self.azimuth_le.text(),
                                            timeframe='hourly',
-                                           ratetype=self.rate_le.currentText().lower())
+                                           ratetype=self.rate_le.currentText().lower(),
+                                           incentivized=self.incentivized())
+
         if self.first_run:
             self.output_box.appendPlainText(scenario.describe())
             self.first_run = False
         else:
             self.output_box.appendPlainText('--------------------' + '\n' + scenario.describe())
 
-        if self.output_check.isChecked():
+        if self.savefilepath.text():
             scenario.hourly_data.to_csv(self.savefilepath.text())
-
 
 def run():
     """Make GUI call-able from python interpreter.
@@ -189,3 +200,5 @@ def run():
     app = QtWidgets.QApplication(sys.argv)
     current_run = Window()
     sys.exit(app.exec())
+
+run()
